@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: ${PORT:8082}
   servlet:
     context-path: /api
 
@@ -24,9 +24,9 @@ spring:
       mode: always
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/AtomHack
-    username: root
-    password: 123
+    url: jdbc:postgresql://localhost:5432/${DATABASE_NAME:AtomHack}
+    username: ${DATABASE_USER:root}
+    password: ${DATABASE_PASSWORD:123}
   jpa:
     openInView: true
     show-sql: false
@@ -39,8 +39,8 @@ spring:
   main:
     allow-circular-references: true
 minio:
-  endpoint: http://31.129.109.44:9000
-  accessKey: miniominio
-  secretKey: miniominio
-  bucket: aquarion
-init: true
+  endpoint: ${MINIO_ENDPOINT:http://31.129.109.44:9000}
+  accessKey: ${MINIO_ACCESS_KEY:miniominio}
+  secretKey: ${MINIO_SECRET_KEY:miniominio}
+  bucket: ${MINIO_BUCKET:aquarion}
+init: ${MINIO_BUCKET:true}
