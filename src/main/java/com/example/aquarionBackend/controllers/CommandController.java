@@ -1,5 +1,6 @@
 package com.example.aquarionBackend.controllers;
 
+import com.example.aquarionBackend.configs.security.CustomUserDetails;
 import com.example.aquarionBackend.exceptions.AppError;
 import com.example.aquarionBackend.models.dtos.UrlDto;
 import com.example.aquarionBackend.models.entities.Access;
@@ -17,6 +18,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +41,11 @@ public class CommandController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class))})
     })
+    @Secured("ROLE_AUTHORIZED")
     @GetMapping("/access")
     public ResponseEntity<UrlDto> getAccess(
-            @RequestParam(name = "system") SystemEnum system){
+            @RequestParam(name = "system") SystemEnum system,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         String res = "";
         try {
             Access access = accessRepo.findFirstBySystem(system).orElse(null);
@@ -62,9 +67,11 @@ public class CommandController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class))})
     })
+    @Secured("ROLE_AUTHORIZED")
     @GetMapping("/management")
     public ResponseEntity<?> getManagement(
-            @RequestParam(name = "system") SystemEnum system){
+            @RequestParam(name = "system") SystemEnum system,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         String res = "";
         try {
             Management management = managementRepo.findFirstBySystem(system).orElse(null);

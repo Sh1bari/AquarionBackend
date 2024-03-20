@@ -1,25 +1,24 @@
 package com.example.aquarionBackend.migrations;
 
+import com.example.aquarionBackend.configs.ConstantsConfig;
 import com.example.aquarionBackend.models.entities.Access;
 import com.example.aquarionBackend.models.entities.Management;
+import com.example.aquarionBackend.models.entities.System;
 import com.example.aquarionBackend.models.enums.SystemEnum;
 import com.example.aquarionBackend.repositories.AccessRepo;
 import com.example.aquarionBackend.repositories.ManagementRepo;
+import com.example.aquarionBackend.repositories.SystemRepo;
 import com.example.aquarionBackend.services.FileService;
-import com.example.aquarionBackend.services.MinioService;
 import jakarta.annotation.PostConstruct;
-import jakarta.mail.internet.MimeMessage;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,100 +28,98 @@ public class Migration {
     private final ManagementRepo managementRepo;
     @Value("${init}")
     private boolean init;
+    @Value("${serverName}")
+    private String serverName;
     private final ResourceLoader resourceLoader;
+    private final ConstantsConfig constantsConfig;
+    private final SystemRepo systemRepo;
 
 
     @PostConstruct
     private void init(){
         if(init) {
             initAccess();
+            initManagement();
+            initDB();
         }
-        //sendEmail("vova_krasnov_2004@mail.ru", "", "");
+    }
+
+    private void initDB(){
+        constantsConfig.getSystems().forEach(o->{
+            systemRepo.save(System.builder()
+                            .colonyName(serverName)
+                            .systemName(o)
+                    .build());
+        });
+
     }
 
     private void initManagement() {
-        try {
-            Management management = Management.builder()
-                    .system(SystemEnum.IMS_3)
-                    .build();
-            managementRepo.save(management);
-            management.setFile(fileService.saveFile(getFileFromResources("management/IMS 3.0/Руководство.docx")));
-            managementRepo.save(management);
-        }catch (Exception e){
-
-        }
-        try {
-            Management management = Management.builder()
-                    .system(SystemEnum.IMS_4)
-                    .build();
-            managementRepo.save(management);
-            management.setFile(fileService.saveFile(getFileFromResources("management/IMS 4.0/Руководство.docx")));
-            managementRepo.save(management);
-        }catch (Exception e){
-
-        }
-        try {
-            Management management = Management.builder()
-                    .system(SystemEnum.MDP_2)
-                    .build();
-            managementRepo.save(management);
-            management.setFile(fileService.saveFile(getFileFromResources("management/MDP 2.0/Руководство.docx")));
-            managementRepo.save(management);
-        }catch (Exception e){
-
-        }
-        try {
-            Management management = Management.builder()
-                    .system(SystemEnum.UTS)
-                    .build();
-            managementRepo.save(management);
-            management.setFile(fileService.saveFile(getFileFromResources("management/UTS/Руководство.docx")));
-            managementRepo.save(management);
-        }catch (Exception e){
-
+        switch (serverName){
+            case "aquarion" -> {
+                initManagementSolo(SystemEnum.IMS_3, "aquarion/management/IMS 3.0/Руководство.docx");
+                initManagementSolo(SystemEnum.IMS_4, "aquarion/management/IMS 4.0/Руководство.docx");
+                initManagementSolo(SystemEnum.MDP_2, "aquarion/management/MDP 2.0/Руководство.docx");
+                initManagementSolo(SystemEnum.UTS, "aquarion/management/UTS/Руководство.docx");
+            }
+            case "green_maze" -> {
+                initManagementSolo(SystemEnum.MDP_2, "green_maze/management/MDP 2.0/Руководство.docx");
+                initManagementSolo(SystemEnum.UTS, "green_maze/management/UTS/Руководство.docx");
+            }
+            case "crystallia" -> {
+                initManagementSolo(SystemEnum.IMS_3, "crystallia/management/IMS 3.0/Руководство.docx");
+                initManagementSolo(SystemEnum.IMS_4, "crystallia/management/IMS 4.0/Руководство.docx");
+            }
+            case "desert_whirlwind" -> {
+                initManagementSolo(SystemEnum.IMS_4, "desert_whirlwind/management/IMS 4.0/Руководство.docx");
+                initManagementSolo(SystemEnum.MDP_2, "desert_whirlwind/management/MDP 2.0/Руководство.docx");
+            }
+            default -> throw new RuntimeException("Colony name not exists");
         }
     }
     private void initAccess(){
-        try {
-            Access access1 = Access.builder()
-                    .system(SystemEnum.IMS_3)
-                    .build();
-            accessRepo.save(access1);
-            access1.setFile(fileService.saveFile(getFileFromResources("access/IMS 3.0/Шаблон получения доступа.docx")));
-            accessRepo.save(access1);
-        }catch (Exception e){
-
+        switch (serverName){
+            case "aquarion" -> {
+                initAccessSolo(SystemEnum.IMS_3, "aquarion/access/IMS 3.0/Шаблон получения доступа.docx");
+                initAccessSolo(SystemEnum.IMS_4, "aquarion/access/IMS 4.0/Инструкция по заполнению.docx");
+                initAccessSolo(SystemEnum.MDP_2, "aquarion/access/MDP 2.0/Инструкция по заполнению.docx");
+                initAccessSolo(SystemEnum.UTS, "aquarion/access/UTS/Инструкция по заполнению.docx");
+            }
+            case "green_maze" -> {
+                initAccessSolo(SystemEnum.MDP_2, "green_maze/access/MDP 2.0/Инструкция по заполнению.docx");
+                initAccessSolo(SystemEnum.UTS, "green_maze/access/UTS/Инструкция по заполнению.docx");
+            }
+            case "crystallia" -> {
+                initAccessSolo(SystemEnum.IMS_3, "crystallia/access/IMS 3.0/Инструкция по заполнению.docx");
+                initAccessSolo(SystemEnum.IMS_4, "crystallia/access/IMS 4.0/Инструкция по заполнению.docx");
+            }
+            case "desert_whirlwind" -> {
+                initAccessSolo(SystemEnum.IMS_4, "desert_whirlwind/access/IMS 4.0/Инструкция по заполнению.docx");
+                initAccessSolo(SystemEnum.MDP_2, "desert_whirlwind/access/MDP 2.0/Инструкция по заполнению.docx");
+            }
+            default -> throw new RuntimeException("Colony name not exists");
         }
+    }
+    private void initManagementSolo(SystemEnum systemEnum, String path){
         try {
-            Access access2 = Access.builder()
-                    .system(SystemEnum.IMS_4)
+            Management management = Management.builder()
+                    .system(systemEnum)
                     .build();
-            accessRepo.save(access2);
-            access2.setFile(fileService.saveFile(getFileFromResources("access/IMS 4.0/Инструкция по заполнению.docx")));
-            accessRepo.save(access2);
-        }catch (Exception e){
+            managementRepo.save(management);
+            management.setFile(fileService.saveFile(getFileFromResources(path)));
+            managementRepo.save(management);
+        }catch (Exception e){}
+    }
 
-        }
+    private void initAccessSolo(SystemEnum systemEnum, String path){
         try {
-            Access access3 = Access.builder()
-                    .system(SystemEnum.MDP_2)
+            Access access = Access.builder()
+                    .system(systemEnum)
                     .build();
-            accessRepo.save(access3);
-            access3.setFile(fileService.saveFile(getFileFromResources("access/MDP 2.0/Инструкция по заполнению.docx")));
-            accessRepo.save(access3);
-        }catch (Exception e){
-
-        }
-        try {
-            Access access4 = Access.builder()
-                    .system(SystemEnum.UTS)
-                    .build();
-            accessRepo.save(access4);
-            access4.setFile(fileService.saveFile(getFileFromResources("access/UTS/Инструкция по заполнению.docx")));
-            accessRepo.save(access4);
-        }catch (Exception e){
-
-        }
+            accessRepo.save(access);
+            access.setFile(fileService.saveFile(getFileFromResources(path)));
+            accessRepo.save(access);
+        }catch (Exception e){}
     }
     public File getFileFromResources(String fileName) throws IOException {
         Resource resource = resourceLoader.getResource("classpath:" + fileName);

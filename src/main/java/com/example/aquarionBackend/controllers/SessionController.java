@@ -1,5 +1,6 @@
 package com.example.aquarionBackend.controllers;
 
+import com.example.aquarionBackend.configs.security.CustomUserDetails;
 import com.example.aquarionBackend.exceptions.AppError;
 import com.example.aquarionBackend.models.dtos.requests.CloseSessionReq;
 import com.example.aquarionBackend.models.dtos.requests.OpenSessionReq;
@@ -16,6 +17,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +41,11 @@ public class SessionController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class))})
     })
+    @Secured("ROLE_AUTHORIZED")
     @PostMapping("/session/open")
     public ResponseEntity<OpenSessionRes> openSession(
-            @RequestBody OpenSessionReq req){
+            @RequestBody OpenSessionReq req,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         OpenSessionRes res = sessionService.openSession(req);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -57,9 +62,11 @@ public class SessionController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class))})
     })
+    @Secured("ROLE_AUTHORIZED")
     @PostMapping("/session/close")
     public ResponseEntity<CloseSessionRes> closeSession(
-            @RequestBody CloseSessionReq sessionId){
+            @RequestBody CloseSessionReq sessionId,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         CloseSessionRes res = sessionService.closeSession(sessionId);
         return ResponseEntity
                 .status(HttpStatus.OK)
