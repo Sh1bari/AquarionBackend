@@ -17,6 +17,7 @@ public class Management {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(unique = true)
     private SystemEnum system;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = true)

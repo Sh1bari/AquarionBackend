@@ -12,6 +12,8 @@ import com.example.aquarionBackend.models.enums.MessageEnum;
 import com.example.aquarionBackend.models.enums.MessagePattern;
 import com.example.aquarionBackend.models.enums.MessageType;
 import com.example.aquarionBackend.repositories.ChatSessionRepo;
+import com.example.aquarionBackend.repositories.MessageRepo;
+import com.example.aquarionBackend.utils.JsonUtils;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
@@ -24,20 +26,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SessionService {
     private final ChatSessionRepo chatSessionRepo;
+    private final MessageRepo messageRepo;
 
-    public OpenSessionRes openSession(OpenSessionReq req){
+    public OpenSessionRes openSession(OpenSessionReq req, String mail){
         LocalDateTime time = LocalDateTime.now();
+        chatSessionRepo.findAllByMailAndEndTimeIsNull(mail).forEach(o->{
+            o.setEndTime(time);
+            chatSessionRepo.save(o);
+        });
         Message message = Message.builder()
                 .messageEnum(MessageEnum.DONE)
-                .messageType(MessageType.NON_DECLARED)
+                .messageType(MessageType.OPEN_SESSION)
                 .position(1)
-                .sent(time)
-                .reply(MessagePattern.OPEN_SESSION.toString())
+                .sentToUserTime(time)
+                .receivedFromUserTime(time)
                 .build();
         ChatSession chatSession = ChatSession.builder()
                 .startTime(time)
                 .FIO(req.getFIO())
-                .mail(req.getMail())
+                .mail(mail)
                 .messages(List.of(message))
                 .build();
         chatSessionRepo.save(chatSession);
@@ -46,15 +53,17 @@ public class SessionService {
                 .pattern(MessagePattern.OPEN_SESSION)
                 .sessionId(chatSession.getId().toString())
                 .build();
+        message.setReplyText(JsonUtils.toJson(res));
+        messageRepo.save(message);
         return res;
     }
 
-    public CloseSessionRes closeSession(CloseSessionReq req){
+    public CloseSessionRes closeSession(CloseSessionReq req, String mail){
         LocalDateTime time = LocalDateTime.now();
         ChatSession chatSession = chatSessionRepo.findById(req.getSessionId())
                 .orElseThrow(()->new ChatSessionNotFoundExc(req.getSessionId()));
-        if(!chatSession.getMail().equals(req.getMail())){
-            throw new PermissionDeniedExc(req.getSessionId());
+        if(!chatSession.getMail().equals(mail)){
+            throw new PermissionDeniedExc();
         }
         chatSession.setEndTime(time);
         chatSessionRepo.save(chatSession);

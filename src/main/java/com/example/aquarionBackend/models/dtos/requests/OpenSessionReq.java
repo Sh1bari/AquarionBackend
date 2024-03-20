@@ -7,5 +7,4 @@ import lombok.*;
 @AllArgsConstructor
 public class OpenSessionReq {
     private String FIO;
-    private String mail;
 }

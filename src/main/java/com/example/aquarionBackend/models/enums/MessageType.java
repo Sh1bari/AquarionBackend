@@ -7,6 +7,6 @@ public enum MessageType {
     SENT_TO_MAIL,
     GET_ACCESS_COMMAND,
     GET_MANAGEMENT_COMMAND,
-    NON_DECLARED
+    OPEN_SESSION
 
 }

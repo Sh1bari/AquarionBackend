@@ -8,6 +8,7 @@ import com.example.aquarionBackend.models.entities.Management;
 import com.example.aquarionBackend.models.enums.SystemEnum;
 import com.example.aquarionBackend.repositories.AccessRepo;
 import com.example.aquarionBackend.repositories.ManagementRepo;
+import com.example.aquarionBackend.services.MessageService;
 import com.example.aquarionBackend.services.MinioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +24,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @Validated
@@ -33,7 +36,9 @@ public class CommandController {
     private final MinioService minioService;
     private final AccessRepo accessRepo;
     private final ManagementRepo managementRepo;
+    private final MessageService messageService;
 
+    @SneakyThrows
     @Operation(summary = "Get access docx", description = "")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success"),
@@ -45,21 +50,20 @@ public class CommandController {
     @GetMapping("/access")
     public ResponseEntity<UrlDto> getAccess(
             @RequestParam(name = "system") SystemEnum system,
+            @RequestParam(name = "sessionId") UUID sessionId,
             @AuthenticationPrincipal CustomUserDetails userDetails){
-        String res = "";
-        try {
-            Access access = accessRepo.findFirstBySystem(system).orElse(null);
-            res = minioService.getPresignedUrlForFile(access.getFile().getPath(), 10000);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        Access access = accessRepo.findFirstBySystem(system).orElse(null);
+        String url = minioService.getPresignedUrlForFile(access.getFile().getPath(), 10000);
+        UrlDto res = UrlDto.builder()
+                .url(url)
+                .build();
+        messageService.createAccessMessage(sessionId, res);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(UrlDto.builder()
-                        .url(res)
-                        .build());
+                .body(res);
     }
 
+    @SneakyThrows
     @Operation(summary = "Get management docx", description = "")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success"),
@@ -71,18 +75,16 @@ public class CommandController {
     @GetMapping("/management")
     public ResponseEntity<?> getManagement(
             @RequestParam(name = "system") SystemEnum system,
+            @RequestParam(name = "sessionId") UUID sessionId,
             @AuthenticationPrincipal CustomUserDetails userDetails){
-        String res = "";
-        try {
-            Management management = managementRepo.findFirstBySystem(system).orElse(null);
-            res = minioService.getPresignedUrlForFile(management.getFile().getPath(), 1000);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        Management management = managementRepo.findFirstBySystem(system).orElse(null);
+        String url = minioService.getPresignedUrlForFile(management.getFile().getPath(), 1000);
+        UrlDto res = UrlDto.builder()
+                .url(url)
+                .build();
+        messageService.createManagementMessage(sessionId, res);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(UrlDto.builder()
-                        .url(res)
-                        .build());
+                .body(res);
     }
 }

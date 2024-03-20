@@ -46,7 +46,7 @@ public class SessionController {
     public ResponseEntity<OpenSessionRes> openSession(
             @RequestBody OpenSessionReq req,
             @AuthenticationPrincipal CustomUserDetails userDetails){
-        OpenSessionRes res = sessionService.openSession(req);
+        OpenSessionRes res = sessionService.openSession(req, userDetails.getUsername());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);
@@ -67,7 +67,7 @@ public class SessionController {
     public ResponseEntity<CloseSessionRes> closeSession(
             @RequestBody CloseSessionReq sessionId,
             @AuthenticationPrincipal CustomUserDetails userDetails){
-        CloseSessionRes res = sessionService.closeSession(sessionId);
+        CloseSessionRes res = sessionService.closeSession(sessionId, userDetails.getUsername());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);

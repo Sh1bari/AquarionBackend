@@ -32,13 +32,15 @@ public class Message {
     @JoinColumn(name = "message_id")
     private List<File> files;
 
-    private String message;
+    @Column(length = 2000)
+    private String messageText;
 
-    private String reply;
+    @Column(length = 2000)
+    private String replyText;
 
     @Basic
-    private LocalDateTime sent;
+    private LocalDateTime sentToUserTime;
 
     @Basic
-    private LocalDateTime received;
+    private LocalDateTime receivedFromUserTime;
 }
