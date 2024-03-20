@@ -44,3 +44,4 @@ minio:
   secretKey: ${MINIO_SECRET_KEY:miniominio}
   bucket: ${MINIO_BUCKET:aquarion}
 init: ${MINIO_BUCKET:true}
+serverName: aquarion

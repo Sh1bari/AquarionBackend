@@ -2,8 +2,6 @@ package com.example.aquarionBackend.models.enums;
 
 import lombok.*;
 
-public enum MessageEnum {
-    PENDING,
-    DONE,
-    ERROR
+public enum MessagePattern {
+    OPEN_SESSION
 }
