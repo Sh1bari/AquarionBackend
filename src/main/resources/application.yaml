@@ -34,3 +34,4 @@ minio:
   bucket: ${MINIO_BUCKET:aquarion}
 init: ${MINIO_BUCKET:true}
 serverName: ${SERVER_NAME:aquarion}
+jwtSecret: ${SECRET:73f5b553-a284-43ef-b3b1-98250db96cde}

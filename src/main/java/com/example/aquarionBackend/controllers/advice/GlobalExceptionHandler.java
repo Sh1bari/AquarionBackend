@@ -8,6 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -33,6 +37,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new AppError(400, exception.getMessage()));
+    }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
+
+        Map<String, Object> errorResponse = new LinkedHashMap<>();
+        errorResponse.put("timestamp", System.currentTimeMillis());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream()
+                .anyMatch(o->o.equals(new SimpleGrantedAuthority("ROLE_ANONYMOUS")))) {
+            errorResponse.put("status", HttpStatus.UNAUTHORIZED.value());
+            errorResponse.put("error", "Unauthorized");
+        } else {
+            errorResponse.put("status", HttpStatus.FORBIDDEN.value());
+            errorResponse.put("error", "Access Denied");
+        }
+
+        errorResponse.put("path", request.getRequestURI());
+
+        return ResponseEntity.status((int) errorResponse.get("status")).body(errorResponse);
     }
 
     @ExceptionHandler({
