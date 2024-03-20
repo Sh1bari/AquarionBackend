@@ -1,0 +1,46 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /api
+
+spring:
+  mail:
+    host: smtp.beget.com
+    port: 2525
+    username: no-reply@rt5-61b.ru
+    password: Bazabaza1!
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  sql:
+    init:
+      mode: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/AtomHack
+    username: root
+    password: 123
+  jpa:
+    openInView: true
+    show-sql: false
+    generateDdl: true
+    database: postgresql
+    databasePlatform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  main:
+    allow-circular-references: true
+minio:
+  endpoint: http://31.129.109.44:9000
+  accessKey: miniominio
+  secretKey: miniominio
+  bucket: aquarion
+init: true
