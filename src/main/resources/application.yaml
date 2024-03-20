@@ -4,17 +4,6 @@ server:
     context-path: /api
 
 spring:
-  mail:
-    host: smtp.beget.com
-    port: 2525
-    username: no-reply@rt5-61b.ru
-    password: Bazabaza1!
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
   servlet:
     multipart:
       max-file-size: 10MB

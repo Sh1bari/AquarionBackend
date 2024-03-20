@@ -1,4 +1,4 @@
-package com.example.aquarionBackend.configs;
+package com.example.aquarionBackend.configs.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

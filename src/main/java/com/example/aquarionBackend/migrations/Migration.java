@@ -39,29 +39,6 @@ public class Migration {
         }
         //sendEmail("vova_krasnov_2004@mail.ru", "", "");
     }
-    private final JavaMailSender mailSender;
-    public void sendEmail(String to, String subject, String body) {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-
-        try {
-            helper.setFrom("no-reply@rt5-61b.ru");
-            // Устанавливаем получателя
-            helper.setTo(to);
-
-            // Устанавливаем тему письма
-            helper.setSubject(subject);
-
-            // Устанавливаем текст письма
-            helper.setText(body);
-
-            // Отправляем письмо
-            mailSender.send(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Обработка ошибок
-        }
-    }
 
     private void initManagement() {
         try {
