@@ -9,6 +9,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CloseSessionReq {
-    private String username;
+    private String mail;
     private UUID sessionId;
 }

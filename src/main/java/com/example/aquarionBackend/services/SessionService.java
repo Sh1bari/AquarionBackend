@@ -24,7 +24,6 @@ public class SessionService {
         ChatSession chatSession = ChatSession.builder()
                 .startTime(time)
                 .FIO(req.getFIO())
-                .username(req.getUsername())
                 .mail(req.getMail())
                 .build();
         chatSessionRepo.save(chatSession);
@@ -39,7 +38,7 @@ public class SessionService {
         LocalDateTime time = LocalDateTime.now();
         ChatSession chatSession = chatSessionRepo.findById(req.getSessionId())
                 .orElseThrow(()->new ChatSessionNotFoundExc(req.getSessionId()));
-        if(!chatSession.getUsername().equals(req.getUsername())){
+        if(!chatSession.getMail().equals(req.getMail())){
             throw new PermissionDeniedExc(req.getSessionId());
         }
         chatSession.setEndTime(time);

@@ -31,6 +31,5 @@ public class ChatSession {
     private LocalDateTime endTime;
 
     private String FIO;
-    private String username;
     private String mail;
 }
