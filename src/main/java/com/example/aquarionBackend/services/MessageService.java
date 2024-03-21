@@ -88,10 +88,12 @@ public class MessageService {
                 .messageText(JsonUtils.toJson(message))
                 .receivedFromUserTime(time)
                 .build();
-        files.forEach(o->{
-            File file = fileService.saveFile(o);
-            msg.getFiles().add(file);
-        });
+        if(files != null) {
+            files.forEach(o -> {
+                File file = fileService.saveFile(o);
+                msg.getFiles().add(file);
+            });
+        }
         return linkMessage(sessionId, msg);
     }
     @Transactional

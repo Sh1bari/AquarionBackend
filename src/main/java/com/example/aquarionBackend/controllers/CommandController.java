@@ -127,17 +127,12 @@ public class CommandController {
                 .status(HttpStatus.CREATED)
                 .build();
     }
-
-    private final KafkaProducerService ser;
     @PostMapping("/send-to-ml")
     public ResponseEntity<?> sendToML(
-            //@RequestParam(name = "sessionId") UUID sessionId,
+            @RequestParam(name = "sessionId") UUID sessionId,
             @RequestBody MessageDto messageDto,
             @AuthenticationPrincipal CustomUserDetails userDetails){
-        ser.sendMessage(KafkaDto.builder()
-                        .messageId(1L)
-                        .payload("Привет")
-                .build());
+        messageService.createMLMessage(sessionId, messageDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
