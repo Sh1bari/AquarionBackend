@@ -133,6 +133,14 @@ public class CommandController {
                 .status(HttpStatus.OK)
                 .body(res);
     }
+    @Operation(summary = "Send message to ml server", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Error",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class))})
+    })
+    @Secured("ROLE_AUTHORIZED")
     @PostMapping("/send-to-ml")
     public ResponseEntity<?> sendToML(
             @RequestParam(name = "sessionId") UUID sessionId,
