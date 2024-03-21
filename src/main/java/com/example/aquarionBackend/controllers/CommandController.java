@@ -6,11 +6,13 @@ import com.example.aquarionBackend.exceptions.AppError;
 import com.example.aquarionBackend.exceptions.CantSendMailExc;
 import com.example.aquarionBackend.models.dtos.KafkaDto;
 import com.example.aquarionBackend.models.dtos.MessageDto;
+import com.example.aquarionBackend.models.dtos.SendToSupportDto;
 import com.example.aquarionBackend.models.dtos.UrlDto;
 import com.example.aquarionBackend.models.dtos.requests.SendToSupportReq;
 import com.example.aquarionBackend.models.entities.Access;
 import com.example.aquarionBackend.models.entities.Management;
 import com.example.aquarionBackend.models.entities.Message;
+import com.example.aquarionBackend.models.enums.MessagePattern;
 import com.example.aquarionBackend.models.enums.SystemEnum;
 import com.example.aquarionBackend.repositories.AccessRepo;
 import com.example.aquarionBackend.repositories.ChatSessionRepo;
@@ -110,7 +112,7 @@ public class CommandController {
     })
     @Secured("ROLE_AUTHORIZED")
     @PostMapping("/send-to-support")
-    public ResponseEntity<?> sendToSupport(
+    public ResponseEntity<SendToSupportDto> sendToSupport(
             @RequestParam(name = "sessionId") UUID sessionId,
             @ModelAttribute SendToSupportReq req,
             @RequestPart(name = "files", required = false) List<MultipartFile> files,
@@ -123,9 +125,13 @@ public class CommandController {
             messageService.rejectReplyMessage(message);
             throw e;
         }
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
+        SendToSupportDto res = SendToSupportDto.builder()
+                .pattern(MessagePattern.WAITING_MESSAGE)
+                .messageId(message.getId())
                 .build();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
     }
     @PostMapping("/send-to-ml")
     public ResponseEntity<?> sendToML(
