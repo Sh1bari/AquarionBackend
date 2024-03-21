@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
         ),
         servers = {
                 //@Server(url = "https://vr.cloudioti.com/api"),
-                @Server(url = "http://localhost:8082/api")
+                @Server(url = "https://aquarion.cry1s.ru/api")
         }
 )
 @Configuration
