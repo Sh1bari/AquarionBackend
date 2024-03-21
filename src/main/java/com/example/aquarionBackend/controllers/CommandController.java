@@ -110,7 +110,7 @@ public class CommandController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class))})
     })
-    @Secured("ROLE_AUTHORIZED")
+    //@Secured("ROLE_AUTHORIZED")
     @PostMapping("/send-to-support")
     public ResponseEntity<SendToSupportDto> sendToSupport(
             @RequestParam(name = "sessionId") UUID sessionId,

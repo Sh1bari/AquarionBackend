@@ -111,6 +111,14 @@ public class MessageService {
     }
 
     @Transactional
+    public void confirmKafkaMessage(Message message, String payload){
+        message.setSentToUserTime(LocalDateTime.now());
+        message.setReplyText(payload);
+        message.setMessageEnum(MessageEnum.DONE);
+        messageRepo.save(message);
+    }
+
+    @Transactional
     public Message createMLMessage(UUID sessionId, MessageDto message){
         LocalDateTime time = LocalDateTime.now();
         Message msg = Message.builder()
