@@ -16,7 +16,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -67,6 +69,13 @@ public class GlobalExceptionHandler {
                 .body(new AppError(400, exception.getBindingResult().getAllErrors().get(0).getDefaultMessage()));
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxUploadSizeException(MaxUploadSizeExceededException ex, WebRequest request) {
+        // TODO ex.getMaxUploadSize() was always -1
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(new AppError(413, "Payload size exceeded, max upload size: " + "10 MB"));
+    }
     @ExceptionHandler({
             GlobalAppException.class
     })
