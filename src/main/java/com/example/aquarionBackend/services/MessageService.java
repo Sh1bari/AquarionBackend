@@ -1,7 +1,6 @@
 package com.example.aquarionBackend.services;
 
 import com.example.aquarionBackend.exceptions.ChatSessionNotFoundExc;
-import com.example.aquarionBackend.models.dtos.MessageDto;
 import com.example.aquarionBackend.models.dtos.UrlDto;
 import com.example.aquarionBackend.models.entities.ChatSession;
 import com.example.aquarionBackend.models.entities.Message;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.UUID;
 
 @Service
@@ -44,7 +41,7 @@ public class MessageService {
     }
 
     @Transactional
-    public MessageDto createAccessMessage(UUID sessionId, UrlDto reply){
+    public void createAccessMessage(UUID sessionId, UrlDto reply){
         LocalDateTime time = LocalDateTime.now();
         Message message = Message.builder()
                 .messageEnum(MessageEnum.DONE)
@@ -54,11 +51,10 @@ public class MessageService {
                 .sentToUserTime(time)
                 .build();
         linkMessage(sessionId, message);
-        return new MessageDto();
     }
 
     @Transactional
-    public MessageDto createManagementMessage(UUID sessionId, UrlDto reply){
+    public void createManagementMessage(UUID sessionId, UrlDto reply){
         LocalDateTime time = LocalDateTime.now();
         Message message = Message.builder()
                 .messageEnum(MessageEnum.DONE)
@@ -68,7 +64,6 @@ public class MessageService {
                 .sentToUserTime(time)
                 .build();
         linkMessage(sessionId, message);
-        return new MessageDto();
     }
 
 

@@ -1,6 +1,8 @@
 package com.example.aquarionBackend.services;
 
 import lombok.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,9 @@ public class ApiService {
         return responseEntity.getBody();
     }
 
-    public <T> T post(String path, Object body, Class<T> responseType) {
-        ResponseEntity<T> responseEntity = restTemplate.postForEntity(path, body, responseType);
+    public <T> T post(String path, Object body, Class<T> responseType, HttpHeaders headers) {
+        // Выполняем POST-запрос с переданным заголовком
+        ResponseEntity<T> responseEntity = restTemplate.postForEntity(path, new HttpEntity<>(body, headers), responseType);
         return responseEntity.getBody();
     }
 }

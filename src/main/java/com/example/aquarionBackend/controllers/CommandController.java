@@ -1,15 +1,22 @@
 package com.example.aquarionBackend.controllers;
 
+import com.example.aquarionBackend.configs.KafkaProducerConfig;
 import com.example.aquarionBackend.configs.security.CustomUserDetails;
 import com.example.aquarionBackend.exceptions.AppError;
+import com.example.aquarionBackend.models.dtos.KafkaDto;
+import com.example.aquarionBackend.models.dtos.MessageDto;
 import com.example.aquarionBackend.models.dtos.UrlDto;
+import com.example.aquarionBackend.models.dtos.requests.SendToSupportReq;
 import com.example.aquarionBackend.models.entities.Access;
 import com.example.aquarionBackend.models.entities.Management;
 import com.example.aquarionBackend.models.enums.SystemEnum;
 import com.example.aquarionBackend.repositories.AccessRepo;
 import com.example.aquarionBackend.repositories.ManagementRepo;
+import com.example.aquarionBackend.services.CommandService;
+import com.example.aquarionBackend.services.KafkaService;
 import com.example.aquarionBackend.services.MessageService;
 import com.example.aquarionBackend.services.MinioService;
+import com.example.aquarionBackend.services.kafka.KafkaProducerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,7 +30,9 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -37,6 +46,8 @@ public class CommandController {
     private final AccessRepo accessRepo;
     private final ManagementRepo managementRepo;
     private final MessageService messageService;
+    private final CommandService commandService;
+    private final KafkaService kafkaService;
 
     @SneakyThrows
     @Operation(summary = "Get access docx", description = "")
@@ -86,5 +97,32 @@ public class CommandController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(res);
+    }
+
+    //@Secured("ROLE_AUTHORIZED")
+    @PostMapping("/send-to-support")
+    public ResponseEntity<?> sendToSupport(
+            @ModelAttribute SendToSupportReq req,
+            @RequestPart(name = "files", required = false) List<MultipartFile> files,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
+        commandService.sendToSupport(req, files);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    private final KafkaProducerService ser;
+    @PostMapping("/send-to-ml")
+    public ResponseEntity<?> sendToML(
+            //@RequestParam(name = "sessionId") UUID sessionId,
+            @RequestBody MessageDto messageDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
+        ser.sendMessage(KafkaDto.builder()
+                        .messageId(1L)
+                        .message("Привет")
+                .build());
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .build();
     }
 }
