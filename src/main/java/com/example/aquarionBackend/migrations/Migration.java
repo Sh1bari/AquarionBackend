@@ -46,10 +46,15 @@ public class Migration {
 
     private void initDB(){
         constantsConfig.getSystems().forEach(o->{
-            systemRepo.save(System.builder()
-                            .colonyName(serverName)
-                            .systemName(o)
-                    .build());
+            try {
+                systemRepo.save(System.builder()
+                        .colonyName(serverName)
+                        .systemName(o)
+                        .build());
+            }catch (Exception e){
+
+            }
+
         });
 
     }

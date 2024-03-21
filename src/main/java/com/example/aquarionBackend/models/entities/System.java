@@ -14,6 +14,7 @@ public class System {
     @Column(name = "id")
     private Long id;
 
+    @Column(unique = true)
     private String systemName;
 
     private String colonyName;
