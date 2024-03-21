@@ -32,7 +32,7 @@ minio:
   accessKey: ${MINIO_ACCESS_KEY:miniominio}
   secretKey: ${MINIO_SECRET_KEY:miniominio}
   bucket: ${MINIO_BUCKET:aquarion}
-init: ${MINIO_BUCKET:true}
+init: ${INIT:true}
 serverName: ${SERVER_NAME:aquarion}
 jwtSecret: ${SECRET:73f5b553-a284-43ef-b3b1-98250db96cde}
 supportServiceUrl: ${SUPPORT_URL:http://31.129.109.44:5011/api}
