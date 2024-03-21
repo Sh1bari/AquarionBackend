@@ -12,6 +12,6 @@ public class KafkaConsumerService {
 
     @KafkaListener(topics = "${kafka.readTopic}", groupId = "1")
     public void consumeMessage(ConsumerRecord<String, KafkaDto> message) {
-        System.out.println("Received message: " + message.value().getMessage());
+        System.out.println("Received message: " + message.value().getPayload());
     }
 }

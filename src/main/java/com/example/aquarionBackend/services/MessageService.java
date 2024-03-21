@@ -2,7 +2,9 @@ package com.example.aquarionBackend.services;
 
 import com.example.aquarionBackend.exceptions.ChatSessionNotFoundExc;
 import com.example.aquarionBackend.models.dtos.UrlDto;
+import com.example.aquarionBackend.models.dtos.requests.SendToSupportReq;
 import com.example.aquarionBackend.models.entities.ChatSession;
+import com.example.aquarionBackend.models.entities.File;
 import com.example.aquarionBackend.models.entities.Message;
 import com.example.aquarionBackend.models.enums.MessageEnum;
 import com.example.aquarionBackend.models.enums.MessageType;
@@ -13,8 +15,10 @@ import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,6 +28,7 @@ public class MessageService {
     private String serverName;
     private final MessageRepo messageRepo;
     private final ChatSessionRepo sessionRepo;
+    private final FileService fileService;
 
     @Transactional
     public Message linkMessage(UUID sessionId, Message message){
@@ -64,6 +69,27 @@ public class MessageService {
                 .sentToUserTime(time)
                 .build();
         linkMessage(sessionId, message);
+    }
+
+    @Transactional
+    public Message createSupportMessage(UUID sessionId, SendToSupportReq message, List<MultipartFile> files){
+        LocalDateTime time = LocalDateTime.now();
+        Message msg = Message.builder()
+                .messageEnum(MessageEnum.PENDING)
+                .messageType(MessageType.SENT_TO_MAIL)
+                .messageText(JsonUtils.toJson(message))
+                .receivedFromUserTime(time)
+                .build();
+        files.forEach(o->{
+            File file = fileService.saveFile(o);
+            msg.getFiles().add(file);
+        });
+        return linkMessage(sessionId, msg);
+    }
+    @Transactional
+    public void confirmReplyMessage(Message message){
+        message.setSentToUserTime(LocalDateTime.now());
+        messageRepo.save(message);
     }
 
 

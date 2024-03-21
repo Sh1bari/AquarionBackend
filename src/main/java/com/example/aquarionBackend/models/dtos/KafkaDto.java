@@ -12,5 +12,5 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class KafkaDto implements Serializable {
     private Long messageId;
-    private String message;
+    private String payload;
 }
