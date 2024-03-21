@@ -39,3 +39,4 @@ supportServiceUrl: ${SUPPORT_URL:http://31.129.109.44:5011/api}
 kafka:
   sendTopic: ${KAFKA_SEND_TO_TOPIC:ai-kafka-consumer}
   readTopic: ${KAFKA_READ_FROM_TOPIC:ai-kafka-producer}
+  server: ${KAFKA_SERVER:31.129.109.44:9092}

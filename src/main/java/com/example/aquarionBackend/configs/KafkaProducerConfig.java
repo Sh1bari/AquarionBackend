@@ -3,6 +3,7 @@ package com.example.aquarionBackend.configs;
 import com.example.aquarionBackend.models.dtos.KafkaDto;
 import lombok.*;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -23,7 +24,8 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
-    private String kafkaServer="31.129.109.44:9092";
+    @Value("${kafka.server}")
+    private String kafkaServer;
 
     @Bean
     public Map<String, Object> producerConfigs() {
