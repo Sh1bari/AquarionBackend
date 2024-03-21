@@ -26,6 +26,9 @@ public class ConstantsConfig {
             case "desert_whirlwind" -> {
                 return List.of("IMS 4.0", "MDP 2.0");
             }
+            case "terramorph" ->{
+                return List.of();
+            }
             default -> throw new RuntimeException("Colony name not exists");
         }
     }

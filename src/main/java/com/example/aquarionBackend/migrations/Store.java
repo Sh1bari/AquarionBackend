@@ -11,4 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class Store {
     private ServerStatus MLServerStatus = ServerStatus.OK;
+    private ServerStatus mailSender = ServerStatus.OK;
+    private ServerStatus access = ServerStatus.OK;
+    private ServerStatus management = ServerStatus.OK;
 }

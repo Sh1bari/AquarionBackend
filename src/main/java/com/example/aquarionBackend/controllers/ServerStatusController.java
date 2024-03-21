@@ -1,6 +1,7 @@
 package com.example.aquarionBackend.controllers;
 
 import com.example.aquarionBackend.migrations.Store;
+import com.example.aquarionBackend.models.dtos.ServerStatusDto;
 import com.example.aquarionBackend.models.enums.ServerStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.*;
@@ -31,6 +32,18 @@ public class ServerStatusController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
+    }
+
+    @GetMapping("/servers")
+    public ResponseEntity<ServerStatusDto> serverHealth(){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ServerStatusDto.builder()
+                        .access(store.getAccess().toString())
+                        .management(store.getManagement().toString())
+                        .mailServer(store.getMailSender().toString())
+                        .mlServer(store.getMLServerStatus().toString())
+                        .build());
     }
 
 }

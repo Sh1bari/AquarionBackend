@@ -4,6 +4,7 @@ import com.example.aquarionBackend.configs.ConstantsConfig;
 import com.example.aquarionBackend.models.entities.Access;
 import com.example.aquarionBackend.models.entities.Management;
 import com.example.aquarionBackend.models.entities.System;
+import com.example.aquarionBackend.models.enums.ServerStatus;
 import com.example.aquarionBackend.models.enums.SystemEnum;
 import com.example.aquarionBackend.repositories.AccessRepo;
 import com.example.aquarionBackend.repositories.ManagementRepo;
@@ -33,6 +34,7 @@ public class Migration {
     private final ResourceLoader resourceLoader;
     private final ConstantsConfig constantsConfig;
     private final SystemRepo systemRepo;
+    private final Store store;
 
 
     @PostConstruct
@@ -66,18 +68,25 @@ public class Migration {
                 initManagementSolo(SystemEnum.IMS_4, "aquarion/management/IMS 4.0/Руководство.docx");
                 initManagementSolo(SystemEnum.MDP_2, "aquarion/management/MDP 2.0/Руководство.docx");
                 initManagementSolo(SystemEnum.UTS, "aquarion/management/UTS/Руководство.docx");
+                store.setManagement(ServerStatus.OK);
             }
             case "green_maze" -> {
                 initManagementSolo(SystemEnum.MDP_2, "green_maze/management/MDP 2.0/Руководство.docx");
                 initManagementSolo(SystemEnum.UTS, "green_maze/management/UTS/Руководство.docx");
+                store.setManagement(ServerStatus.OK);
             }
             case "crystallia" -> {
                 initManagementSolo(SystemEnum.IMS_3, "crystallia/management/IMS 3.0/Руководство.docx");
                 initManagementSolo(SystemEnum.IMS_4, "crystallia/management/IMS 4.0/Руководство.docx");
+                store.setManagement(ServerStatus.OK);
             }
             case "desert_whirlwind" -> {
                 initManagementSolo(SystemEnum.IMS_4, "desert_whirlwind/management/IMS 4.0/Руководство.docx");
                 initManagementSolo(SystemEnum.MDP_2, "desert_whirlwind/management/MDP 2.0/Руководство.docx");
+                store.setManagement(ServerStatus.OK);
+            }
+            case "terramorph" ->{
+                store.setManagement(ServerStatus.ERROR);
             }
             default -> throw new RuntimeException("Colony name not exists");
         }
@@ -89,18 +98,25 @@ public class Migration {
                 initAccessSolo(SystemEnum.IMS_4, "aquarion/access/IMS 4.0/Инструкция по заполнению.docx");
                 initAccessSolo(SystemEnum.MDP_2, "aquarion/access/MDP 2.0/Инструкция по заполнению.docx");
                 initAccessSolo(SystemEnum.UTS, "aquarion/access/UTS/Инструкция по заполнению.docx");
+                store.setAccess(ServerStatus.OK);
             }
             case "green_maze" -> {
                 initAccessSolo(SystemEnum.MDP_2, "green_maze/access/MDP 2.0/Инструкция по заполнению.docx");
                 initAccessSolo(SystemEnum.UTS, "green_maze/access/UTS/Инструкция по заполнению.docx");
+                store.setAccess(ServerStatus.OK);
             }
             case "crystallia" -> {
                 initAccessSolo(SystemEnum.IMS_3, "crystallia/access/IMS 3.0/Инструкция по заполнению.docx");
                 initAccessSolo(SystemEnum.IMS_4, "crystallia/access/IMS 4.0/Инструкция по заполнению.docx");
+                store.setAccess(ServerStatus.OK);
             }
             case "desert_whirlwind" -> {
                 initAccessSolo(SystemEnum.IMS_4, "desert_whirlwind/access/IMS 4.0/Инструкция по заполнению.docx");
                 initAccessSolo(SystemEnum.MDP_2, "desert_whirlwind/access/MDP 2.0/Инструкция по заполнению.docx");
+                store.setAccess(ServerStatus.OK);
+            }
+            case "terramorph" ->{
+                store.setAccess(ServerStatus.ERROR);
             }
             default -> throw new RuntimeException("Colony name not exists");
         }
