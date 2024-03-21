@@ -1,6 +1,10 @@
 package com.example.aquarionBackend.services;
 
 import com.example.aquarionBackend.exceptions.ChatSessionNotFoundExc;
+import com.example.aquarionBackend.exceptions.ServiceUnavailableExc;
+import com.example.aquarionBackend.migrations.Store;
+import com.example.aquarionBackend.models.dtos.KafkaDto;
+import com.example.aquarionBackend.models.dtos.MessageDto;
 import com.example.aquarionBackend.models.dtos.UrlDto;
 import com.example.aquarionBackend.models.dtos.requests.SendToSupportReq;
 import com.example.aquarionBackend.models.entities.ChatSession;
@@ -8,8 +12,10 @@ import com.example.aquarionBackend.models.entities.File;
 import com.example.aquarionBackend.models.entities.Message;
 import com.example.aquarionBackend.models.enums.MessageEnum;
 import com.example.aquarionBackend.models.enums.MessageType;
+import com.example.aquarionBackend.models.enums.ServerStatus;
 import com.example.aquarionBackend.repositories.ChatSessionRepo;
 import com.example.aquarionBackend.repositories.MessageRepo;
+import com.example.aquarionBackend.services.kafka.KafkaProducerService;
 import com.example.aquarionBackend.utils.JsonUtils;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +35,8 @@ public class MessageService {
     private final MessageRepo messageRepo;
     private final ChatSessionRepo sessionRepo;
     private final FileService fileService;
+    private final KafkaProducerService kafkaProducerService;
+    private final Store store;
 
     @Transactional
     public Message linkMessage(UUID sessionId, Message message){
@@ -89,7 +97,38 @@ public class MessageService {
     @Transactional
     public void confirmReplyMessage(Message message){
         message.setSentToUserTime(LocalDateTime.now());
+        message.setMessageEnum(MessageEnum.DONE);
         messageRepo.save(message);
+    }
+
+    @Transactional
+    public void rejectReplyMessage(Message message){
+        message.setSentToUserTime(LocalDateTime.now());
+        message.setMessageEnum(MessageEnum.ERROR);
+        messageRepo.save(message);
+    }
+
+    @Transactional
+    public Message createMLMessage(UUID sessionId, MessageDto message){
+        LocalDateTime time = LocalDateTime.now();
+        Message msg = Message.builder()
+                .messageEnum(MessageEnum.PENDING)
+                .messageType(MessageType.SENT_TO_AI)
+                .messageText(JsonUtils.toJson(message))
+                .receivedFromUserTime(time)
+                .build();
+        Message entity = linkMessage(sessionId, msg);
+        try {
+            kafkaProducerService.sendMessage(KafkaDto.builder()
+                    .messageId(entity.getId())
+                    .payload(message.getMessage())
+                    .build());
+            store.setMLServerStatus(ServerStatus.OK);
+        }catch (Exception e){
+            store.setMLServerStatus(ServerStatus.ERROR);
+            throw new ServiceUnavailableExc();
+        }
+        return entity;
     }
 
 

@@ -3,6 +3,7 @@ package com.example.aquarionBackend.controllers;
 import com.example.aquarionBackend.configs.KafkaProducerConfig;
 import com.example.aquarionBackend.configs.security.CustomUserDetails;
 import com.example.aquarionBackend.exceptions.AppError;
+import com.example.aquarionBackend.exceptions.CantSendMailExc;
 import com.example.aquarionBackend.models.dtos.KafkaDto;
 import com.example.aquarionBackend.models.dtos.MessageDto;
 import com.example.aquarionBackend.models.dtos.UrlDto;
@@ -100,7 +101,13 @@ public class CommandController {
                 .status(HttpStatus.OK)
                 .body(res);
     }
-
+    @Operation(summary = "Send message to support", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Error",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class))})
+    })
     @Secured("ROLE_AUTHORIZED")
     @PostMapping("/send-to-support")
     public ResponseEntity<?> sendToSupport(
@@ -109,8 +116,13 @@ public class CommandController {
             @RequestPart(name = "files", required = false) List<MultipartFile> files,
             @AuthenticationPrincipal CustomUserDetails userDetails){
         Message message = messageService.createSupportMessage(sessionId, req, files);
-        commandService.sendToSupport(req, files);
-        messageService.confirmReplyMessage(message);
+        try {
+            commandService.sendToSupport(req, files);
+            messageService.confirmReplyMessage(message);
+        }catch (CantSendMailExc e){
+            messageService.rejectReplyMessage(message);
+            throw e;
+        }
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();

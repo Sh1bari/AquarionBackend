@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaConsumerService {
 
-    @KafkaListener(topics = "${kafka.readTopic}", groupId = "1")
+    @KafkaListener(topics = "${kafka.readTopic}", groupId = "2")
     public void consumeMessage(ConsumerRecord<String, KafkaDto> message) {
         System.out.println("Received message: " + message.value().getPayload());
     }
